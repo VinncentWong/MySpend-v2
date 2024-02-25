@@ -1,0 +1,17 @@
+eureka:
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://localhost:8001/eureka/ # eureka url
+
+# =============================== JWT CFG ===========================================
+jwt:
+  secret: test-centwong-123-456-789-101112-131415-161718-192021_AZXCVBNM<>?
+
+# =============================== ENDPOINT CFG ===========================================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
