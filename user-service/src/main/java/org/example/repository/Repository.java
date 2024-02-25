@@ -44,7 +44,7 @@ public class Repository implements IRepository{
                     .data(res)
                     .build();
         } catch(NoResultException ex){
-            return null;
+            return RepositoryData.<User>builder().build();
         }
     }
 
