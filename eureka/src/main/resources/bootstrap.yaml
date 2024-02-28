@@ -3,9 +3,16 @@ spring:
     name: eureka-server
   cloud:
     config:
-      uri: http://localhost:8000/
+      uri: http://localhost:8000
     loadbalancer:
       ribbon.enabled: false
+
+eureka:
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+    serviceUrl:
+      defaultZone: http://localhost:8001/eureka/ # eureka url
 
 server:
   port: 8001

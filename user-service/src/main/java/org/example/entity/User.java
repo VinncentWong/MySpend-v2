@@ -2,6 +2,7 @@ package org.example.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.example.entity.listener.UserListener;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 @Builder
+@EntityListeners(value = UserListener.class)
 public class User {
 
     @Id
@@ -50,5 +52,5 @@ public class User {
     private LocalDateTime deletedAt;
 
     @Column(name = "is_active")
-    private Boolean isActive = true;
+    private Boolean isActive;
 }

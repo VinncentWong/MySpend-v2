@@ -11,7 +11,7 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=centwong
     volumes:
-      - myspend_mysql_volume::/var/lib/mysql
+      - myspend_mysql_volume:/var/lib/mysql
   redis:
     container_name: myspend_redis
     image: redis:7.2.3

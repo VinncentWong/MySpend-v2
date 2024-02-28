@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.example.entity.User;
+import org.example.validator.annotation.StrictRole;
 
 import java.time.LocalDate;
 
@@ -25,11 +26,11 @@ public class UserDto {
             String password,
 
             @NotNull
-            @NotBlank
             LocalDate birthDate,
 
             @NotNull
             @NotBlank
+            @StrictRole
             String role
     ){
         public User toUser(){
@@ -40,6 +41,19 @@ public class UserDto {
                     .email(email)
                     .password(password)
                     .role(role)
+                    .build();
+        }
+    }
+
+    public record Login(
+            String email,
+            String password
+    ){
+        public User toUser(){
+            return User
+                    .builder()
+                    .email(email)
+                    .password(password)
                     .build();
         }
     }
