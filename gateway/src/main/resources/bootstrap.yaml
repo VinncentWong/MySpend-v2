@@ -6,6 +6,18 @@ spring:
       uri: http://localhost:8000
     loadbalancer:
       ribbon.enabled: false
+    gateway:
+      discovery:
+        locator.enabled: true
+      routes:
+        - id: "user-service"
+          predicates:
+            - Path=/user-service/**
+          filters:
+            - RewritePath=/user-service/(?<path>.*), /$\{path}
+          uri: lb://user-service
+  main:
+    web-application-type: reactive
 
 server:
   port: 8002

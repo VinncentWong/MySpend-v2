@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
 public interface IRepository {
     RepositoryData<User> save(User user);
     RepositoryData<User> get(UserParam param);

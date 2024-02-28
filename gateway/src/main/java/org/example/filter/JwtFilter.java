@@ -27,7 +27,6 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Predicate;
 
 @Component
@@ -40,8 +39,9 @@ public class JwtFilter implements GlobalFilter {
     @Value("${jwt.secret}")
     private String jwtSecret;
 
-    private Map<String, List<HttpMethod>> nonSecuredEndpoints = Map.ofEntries(
-
+    private List<String> nonSecuredEndpoints = List.of(
+        "/user/register",
+        "/user/login"
     );
 
     @Override
@@ -57,25 +57,18 @@ public class JwtFilter implements GlobalFilter {
 
         Predicate<ServerHttpRequest> isNonSecuredEndpoint = (r) -> {
             var path = r.getURI().getPath();
-            var method = r.getMethod();
             log.info("req path: {}", path);
             return nonSecuredEndpoints
-                    .entrySet()
                     .stream()
-                    .anyMatch((entry) -> {
-                        var key = entry.getKey();
-                        var value = entry.getValue();
+                    .anyMatch((p) -> {
 
                         var pathContainer = PathContainer.parsePath(path);
                         var pathPattern = PathPatternParser
                                 .defaultInstance
-                                .parse(key);
+                                .parse(p);
 
                         return pathPattern
-                                .matches(pathContainer)
-                                &&
-                                value.stream()
-                                        .anyMatch((m) -> m.equals(method));
+                                .matches(pathContainer);
                     });
         };
 

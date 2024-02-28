@@ -1,6 +1,9 @@
 package org.example.interceptor;
 
+import centwong.utility.exception.ForbiddenException;
 import centwong.utility.response.HttpResponse;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -14,17 +17,13 @@ public class Interceptor {
     public ResponseEntity<HttpResponse> handleException(MethodArgumentNotValidException ex){
         var messages = ex.getAllErrors()
                 .stream()
-                .map(ObjectError::toString)
+                .map(ObjectError::getDefaultMessage)
                 .toList();
-        var totalMessage = "";
-        for(var m: messages){
-            totalMessage += m + "\n";
-        }
 
         return ResponseEntity
                 .internalServerError()
                 .body(
-                        HttpResponse.sendErrorResponse(totalMessage, false)
+                        HttpResponse.sendErrorResponse(messages.toString(), false)
                 );
     }
 
@@ -32,6 +31,15 @@ public class Interceptor {
     public ResponseEntity<HttpResponse> handleException(RuntimeException ex){
         return ResponseEntity
                 .internalServerError()
+                .body(
+                        HttpResponse.sendErrorResponse(ex.getMessage(), false)
+                );
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<HttpResponse> handleException(ForbiddenException ex){
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
                 .body(
                         HttpResponse.sendErrorResponse(ex.getMessage(), false)
                 );

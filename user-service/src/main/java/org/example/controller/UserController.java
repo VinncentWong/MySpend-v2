@@ -4,6 +4,7 @@ import centwong.utility.constant.ContextConstant;
 import centwong.utility.constant.HttpHeaderConstant;
 import centwong.utility.response.HttpResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.example.dto.UserDto;
 import org.example.entity.User;
 import org.example.entity.UserParam;
@@ -32,7 +33,7 @@ public class UserController {
     )
     public ResponseEntity<HttpResponse> save(
             HttpServletRequest req,
-            @RequestBody UserDto.Create dto
+            @RequestBody @Valid UserDto.Create dto
     ){
         var initialTime = LocalDateTime.now();
         var data = this.service.save(dto.toUser());
@@ -44,8 +45,32 @@ public class UserController {
                         HttpStatus.CREATED,
                         "successfully create user",
                         data.getData(),
-                        null,
-                        null
+                        data.getPg(),
+                        data.getMetadata()
+                ));
+    }
+
+    @PostMapping(
+            value = "/login",
+            consumes = {MediaType.APPLICATION_JSON_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE}
+    )
+    public ResponseEntity<HttpResponse> login(
+            HttpServletRequest req,
+            @RequestBody UserDto.Login dto
+    ){
+        var initialTime = LocalDateTime.now();
+        var data = this.service.login(dto);
+        return ResponseEntity
+                .ok(HttpResponse.sendSuccessResponse(
+                        Context
+                                .of(ContextConstant.TIME_START, initialTime)
+                                .put(ContextConstant.REQUEST_PATH, req.getRequestURI()),
+                        HttpStatus.OK,
+                        "user authenticated",
+                        data.getData(),
+                        data.getPg(),
+                        data.getMetadata()
                 ));
     }
 
@@ -54,10 +79,10 @@ public class UserController {
             produces = {MediaType.APPLICATION_JSON_VALUE}
     )
     public ResponseEntity<HttpResponse> get(
-            HttpServletRequest req
+            HttpServletRequest req,
+            @PathVariable("id") Long id
     ){
         var initialTime = LocalDateTime.now();
-        var id = Long.parseLong(req.getHeader(HttpHeaderConstant.USER_ID));
         var data = this.service
                 .get(
                         UserParam
@@ -73,8 +98,8 @@ public class UserController {
                         HttpStatus.OK,
                         "successfully get user",
                         data.getData(),
-                        null,
-                        null
+                        data.getPg(),
+                        data.getMetadata()
                 ));
     }
 
@@ -83,15 +108,15 @@ public class UserController {
     )
     public ResponseEntity<HttpResponse> getList(
             HttpServletRequest req,
-            @RequestParam(name = "id") Long id,
-            @RequestParam(name = "ids") List<Long> ids,
-            @RequestParam(name = "email") String email,
-            @RequestParam(name = "emails") List<String> emails,
-            @RequestParam(name = "name") String name,
-            @RequestParam(name = "names") List<String> names,
-            @RequestParam(name = "isActive") Boolean isActive,
-            @RequestParam(name = "limit") Long limit,
-            @RequestParam(name = "offset") Long offset
+            @RequestParam(name = "id", required = false) Long id,
+            @RequestParam(name = "ids", required = false) List<Long> ids,
+            @RequestParam(name = "email", required = false) String email,
+            @RequestParam(name = "emails", required = false) List<String> emails,
+            @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "names", required = false) List<String> names,
+            @RequestParam(name = "isActive", required = false) Boolean isActive,
+            @RequestParam(name = "limit", required = false) Integer limit,
+            @RequestParam(name = "offset", required = false) Long offset
             ){
         var initialTime = LocalDateTime.now();
         var data = this.service
@@ -99,6 +124,13 @@ public class UserController {
                         UserParam
                                 .builder()
                                 .id(id)
+                                .pg(
+                                        HttpResponse.PaginationParam
+                                                .builder()
+                                                .limit(limit)
+                                                .offset(offset)
+                                                .build()
+                                )
                                 .build()
                 );
         return ResponseEntity
@@ -109,8 +141,8 @@ public class UserController {
                         HttpStatus.OK,
                         "successfully get list user",
                         data.getData(),
-                        null,
-                        null
+                        data.getPg(),
+                        data.getMetadata()
                 ));
     }
 
@@ -121,25 +153,13 @@ public class UserController {
     )
     public ResponseEntity<HttpResponse> save(
             HttpServletRequest req,
-            @RequestParam(name = "id") Long id,
-            @RequestParam(name = "ids") List<Long> ids,
-            @RequestParam(name = "email") String email,
-            @RequestParam(name = "emails") List<String> emails,
-            @RequestParam(name = "name") String name,
-            @RequestParam(name = "names") List<String> names,
-            @RequestParam(name = "isActive") Boolean isActive,
             @RequestBody User user
     ){
         var initialTime = LocalDateTime.now();
+        var id = Long.parseLong(req.getHeader(HttpHeaderConstant.USER_ID));
         var param = UserParam
                 .builder()
                 .id(id)
-                .ids(ids)
-                .names(names)
-                .email(email)
-                .emails(emails)
-                .name(name)
-                .isActive(isActive)
                 .build();
         this.service.update(param, user);
         return ResponseEntity
@@ -160,25 +180,13 @@ public class UserController {
             produces = {MediaType.APPLICATION_JSON_VALUE}
     )
     public ResponseEntity<HttpResponse> delete(
-            HttpServletRequest req,
-            @RequestParam(name = "id") Long id,
-            @RequestParam(name = "ids") List<Long> ids,
-            @RequestParam(name = "email") String email,
-            @RequestParam(name = "emails") List<String> emails,
-            @RequestParam(name = "name") String name,
-            @RequestParam(name = "names") List<String> names,
-            @RequestParam(name = "isActive") Boolean isActive
+            HttpServletRequest req
     ){
         var initialTime = LocalDateTime.now();
+        var id = Long.parseLong(req.getHeader(HttpHeaderConstant.USER_ID));
         var param = UserParam
                 .builder()
                 .id(id)
-                .ids(ids)
-                .names(names)
-                .email(email)
-                .emails(emails)
-                .name(name)
-                .isActive(isActive)
                 .build();
         this.service.delete(param);
         return ResponseEntity
@@ -199,34 +207,22 @@ public class UserController {
             produces = {MediaType.APPLICATION_JSON_VALUE}
     )
     public ResponseEntity<HttpResponse> activate(
-            HttpServletRequest req,
-            @RequestParam(name = "id") Long id,
-            @RequestParam(name = "ids") List<Long> ids,
-            @RequestParam(name = "email") String email,
-            @RequestParam(name = "emails") List<String> emails,
-            @RequestParam(name = "name") String name,
-            @RequestParam(name = "names") List<String> names,
-            @RequestParam(name = "isActive") Boolean isActive
+            HttpServletRequest req
     ){
         var initialTime = LocalDateTime.now();
+        var id = Long.parseLong(req.getHeader(HttpHeaderConstant.USER_ID));
         var param = UserParam
                 .builder()
                 .id(id)
-                .ids(ids)
-                .names(names)
-                .email(email)
-                .emails(emails)
-                .name(name)
-                .isActive(isActive)
                 .build();
-        this.service.delete(param);
+        this.service.activate(param);
         return ResponseEntity
                 .ok(HttpResponse.sendSuccessResponse(
                         Context
                                 .of(ContextConstant.TIME_START, initialTime)
                                 .put(ContextConstant.REQUEST_PATH, req.getRequestURI()),
                         HttpStatus.OK,
-                        "successfully delete user",
+                        "successfully activate user",
                         null,
                         null,
                         null

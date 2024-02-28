@@ -13,6 +13,7 @@ import org.example.mapper.UserMapper;
 
 import java.util.List;
 
+@org.springframework.stereotype.Repository
 @Slf4j
 public class Repository implements IRepository{
 
@@ -44,7 +45,9 @@ public class Repository implements IRepository{
                     .data(res)
                     .build();
         } catch(NoResultException ex){
-            return RepositoryData.<User>builder().build();
+            return RepositoryData
+                    .<User>builder()
+                    .build();
         }
     }
 
@@ -80,10 +83,8 @@ public class Repository implements IRepository{
                     .pg(isPgExist? pg: null)
                     .build();
         } catch(NoResultException ex){
-            return RepositoryData
+            return  RepositoryData
                     .<List<User>>builder()
-                    .data(List.of())
-                    .pg(null)
                     .build();
         }
     }
