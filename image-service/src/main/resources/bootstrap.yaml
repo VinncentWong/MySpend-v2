@@ -1,6 +1,6 @@
 spring:
   application:
-    name: user-service
+    name: image-service
   cloud:
     config:
       uri: http://localhost:8000
@@ -8,7 +8,7 @@ spring:
     virtual:
       enabled: true
 server:
-  port: 8004
+  port: 8006
 
 eureka:
   instance:
@@ -18,3 +18,7 @@ eureka:
     fetchRegistry: true
     serviceUrl:
       defaultZone: http://localhost:8001/eureka/ # eureka url
+
+api:
+  cloudinary:
+    url: cloudinary://568542818831687:qY_sn_LdLPpPB87MxbwzvbFG6HY@dp4yqkorq

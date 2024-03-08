@@ -31,3 +31,4 @@ build/
 
 ### VS Code ###
 .vscode/
+/config-server/src/main/resources/config/image-service.yaml

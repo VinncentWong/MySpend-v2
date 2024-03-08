@@ -16,6 +16,13 @@ spring:
           filters:
             - RewritePath=/user-service/(?<path>.*), /$\{path}
           uri: lb://user-service
+        - id: "artwork-service"
+          predicates:
+            - Path=/artwork-service/**
+          filters:
+            - RewritePath=/artwork-service/(?<path>.*), /$\{path}
+            - ArtworkFilter=
+          uri: lb://artwork-service
   main:
     web-application-type: reactive
 
