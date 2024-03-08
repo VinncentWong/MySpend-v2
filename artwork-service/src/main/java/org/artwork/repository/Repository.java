@@ -61,7 +61,7 @@ public class Repository implements IRepository {
             var res = query.getResultList();
             var resCount = queryCount.getSingleResult();
 
-            var isParamExist = param.getPgParam().getLimit() != null && param.getPgParam().getOffset() != null;
+            var isParamExist = param.getPgParam() != null && param.getPgParam().getLimit() != null && param.getPgParam().getOffset() != null;
 
             Long totalPage = null;
 
