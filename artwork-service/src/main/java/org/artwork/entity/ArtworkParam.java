@@ -17,6 +17,12 @@ public class ArtworkParam {
     @ParamColumn(name = "id")
     private List<Long> ids;
 
+    @ParamColumn(name = "name")
+    private String name;
+
+    @ParamColumn(name = "name")
+    private List<String> names;
+
     @ParamColumn(name = "description")
     private String description;
 
@@ -64,6 +70,12 @@ public class ArtworkParam {
 
     @ParamColumn(name = "is_active")
     private Boolean isActive;
+
+    @ParamColumn(name = "fk_user_id")
+    private Long fkUserId;
+
+    @ParamColumn(name = "fk_user_id")
+    private List<Long> fkUserIds;
 
     private HttpResponse.PaginationParam pgParam;
 }

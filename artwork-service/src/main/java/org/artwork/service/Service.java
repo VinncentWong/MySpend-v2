@@ -11,6 +11,7 @@ import org.artwork.entity.ArtworkParam;
 import org.artwork.constant.EndpointConstant;
 import org.artwork.entity.Artwork;
 import org.artwork.entity.CloudinaryResp;
+import org.artwork.mapper.ArtworkMapper;
 import org.artwork.repository.IRepository;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @org.springframework.stereotype.Service
@@ -36,6 +38,8 @@ public class Service implements IService {
 
     @Autowired
     private ObjectMapper mapper;
+
+    private final ArtworkMapper artworkMapper = ArtworkMapper.INSTANCE;
 
     @SneakyThrows
     @Override
@@ -137,16 +141,62 @@ public class Service implements IService {
 
     @Override
     public void update(ArtworkParam param, Artwork artwork) {
+        log.info("accept update param: {} with data: {}", param, artwork);
+        var res = this.repository
+                .get(param)
+                .getData();
 
+        if(res == null){
+            log.error("res with param: {} on update result nothing", param);
+        } else {
+            var updatedData = this.artworkMapper.update(artwork, res);
+            this.repository.save(updatedData);
+            log.info("successfully update data: {}", updatedData);
+        }
     }
 
     @Override
     public void delete(ArtworkParam param) {
+        log.info("accept delete param: {}", param);
+        var res = this.repository
+                .get(param)
+                .getData();
 
+        var dataUpdate = Artwork
+                .builder()
+                .deletedAt(LocalDateTime.now())
+                .isActive(false)
+                .build();
+
+        if(res == null){
+            log.error("res with param: {} on update result nothing", param);
+        } else {
+            var updatedData = this.artworkMapper.update(dataUpdate, res);
+            this.repository.save(updatedData);
+            log.info("successfully delete data: {}", updatedData);
+        }
     }
 
     @Override
     public void activate(ArtworkParam param) {
+        log.info("accept activate param: {}", param);
+        var res = this.repository
+                .get(param)
+                .getData();
 
+        var dataUpdate = Artwork
+                .builder()
+                .updatedAt(LocalDateTime.now())
+                .deletedAt(null)
+                .isActive(true)
+                .build();
+
+        if(res == null){
+            log.error("res with param: {} on update result nothing", param);
+        } else {
+            var updatedData = this.artworkMapper.update(dataUpdate, res);
+            this.repository.save(updatedData);
+            log.info("successfully activate data: {}", updatedData);
+        }
     }
 }
