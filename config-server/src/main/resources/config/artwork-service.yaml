@@ -1,12 +1,12 @@
 # =============================== SPRING CFG ===========================================
 spring:
   flyway:
-    url: jdbc:mysql://localhost:3306/user
-    locations: classpath:/db/migration/user
+    url: jdbc:mysql://localhost:3306/artwork
+    locations: classpath:/db/migration/artwork
     user: root
     password: centwong
   datasource:
-    url: jdbc:mysql://localhost:3306/user
+    url: jdbc:mysql://localhost:3306/artwork
     username: root
     password: centwong
   jpa:
